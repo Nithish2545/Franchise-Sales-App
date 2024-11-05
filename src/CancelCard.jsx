@@ -1,59 +1,70 @@
 import { useState } from "react";
-import { doc, getDocs, addDoc, deleteDoc, collection, query, where, serverTimestamp } from "firebase/firestore";
+import {
+  doc,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  collection,
+  query,
+  where,
+  serverTimestamp,
+} from "firebase/firestore";
 import { db } from "./firebase";
+import collection_baseAwb from "./functions/collectionName";
 
 function CancelCard({ item, index }) {
-
   // const [details, setDetails] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false); // State for button loading
 
   const handleAcceptClick = async (awbNumber) => {
-
     setIsSubmitting(true); // Start loading when submitting
-  
+
     try {
       // Step 1: Query the "pickups" collection to get the document that matches the awbNumber
-      const q = query(collection(db, "pickup"), where("awbNumber", "==", awbNumber));
+      const q = query(
+        collection(db, collection_baseAwb.getCollection()),
+        where("awbNumber", "==", awbNumber)
+      );
       const querySnapshot = await getDocs(q);
       let final_result = [];
-  
+
       querySnapshot.forEach((doc) => {
         final_result.push({ id: doc.id, ...doc.data() });
       });
-  
+
       if (final_result.length === 0) {
-        throw new Error("No matching AWB number found in the pickups collection");
+        throw new Error(
+          "No matching AWB number found in the pickups collection"
+        );
       }
-  
+
       const matchedData = final_result[0];
-  
+
       // Step 2: Push the matched data into the "cancelled_data" collection
       const cancelledData = {
         ...matchedData, // All existing data from the matched document
         cancelReason: cancelReason, // Add the cancelReason field
         cancelledAt: serverTimestamp(), // Add a cancellation timestamp if needed
       };
-  
+
       await addDoc(collection(db, "cancelled_data"), cancelledData);
       console.log("Data successfully added to 'cancelled_data' collection");
-  
+
       // Step 3: Delete the matched document from the "pickups" collection
-      const userDocRef = doc(db, "pickup", matchedData.id);
+      const userDocRef = doc(
+        db,
+        collection_baseAwb.getCollection(),
+        matchedData.id
+      );
       await deleteDoc(userDocRef);
       console.log("Data successfully deleted from 'pickups' collection");
-  
       setIsModalOpen(false); // Close the modal after cancellation
-
     } catch (error) {
-
       console.error("Error in handling booking cancellation:", error);
-
     } finally {
-
       setIsSubmitting(false); // Stop loading after completion
-
     }
   };
 

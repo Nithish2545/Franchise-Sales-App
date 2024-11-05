@@ -10,6 +10,7 @@ import {
   doc,
 } from "firebase/firestore";
 import { db } from "./firebase";
+import collection_baseAWb from "./functions/collectionName";
 
 function CancelCard({ item, index }) {
 
@@ -26,7 +27,7 @@ function CancelCard({ item, index }) {
     // pickupDatetime
 
     const q = query(
-      collection(db, "pickup"),
+      collection(db, collection_baseAWb.getCollection()),
       where("awbNumber", "==", awbNumber)
     );
 
@@ -37,7 +38,7 @@ function CancelCard({ item, index }) {
       final_result.push({ id: doc.id, ...doc.data() });
     });
 
-    const docRef = doc(db, "pickup", final_result[0].id); // db is your Firestore instance
+    const docRef = doc(db, collection_baseAWb.getCollection(), final_result[0].id); // db is your Firestore instance
 
     const updatedFields = {
       pickupDatetime: selectedDate + " " + "&" + Hour + " " + Timeperiod,

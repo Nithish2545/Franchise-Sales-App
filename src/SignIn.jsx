@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { auth, db } from "./firebase"; // Ensure you have configured Firebase correctly
+import { auth} from "./firebase"; // Ensure you have configured Firebase correctly
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
-import { collection, query, getDocs } from "firebase/firestore";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,81 +18,6 @@ const SignIn = () => {
     setAuthError(""); // Clear previous error before submission
     try {
       await signInWithEmailAndPassword(auth, data.email, data.password);
-      // console.log("You are signed in successfully!", result);
-      const q = query(collection(db, "FranchiseLoginCredentials"));
-      // Fetch the query results
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        console.log(data);
-        // Check if the document has an array named "haman"
-        if (Array.isArray(data[data.email])) {
-          console.log(`Document ID: ${doc.id}`);
-          console.log("Haman Array:", data[data.email]);
-
-          const user = {
-            name: data[data.email][0],
-            email: data[data.email][1],
-            role: data[data.email][2],
-            FrachiseLocation: data[data.email][3],
-          };
-
-          localStorage.setItem("FrachiseLogin", JSON.stringify(user));
-        } else {
-          setAuthError();
-          console.log(`Invalid email or password. Please try again.'`);
-        }
-      });
-
-      // if (auth.currentUser.email === "dhanush@gmail.com") {
-      //   localStorage.setItem(
-      //     "enquiryAuthToken",
-      //     JSON.stringify({
-      //       email: "dhanush@gmail.com",
-      //       role: "sales admin",
-      //       name: "dhanush",
-      //     })
-      //   );
-      //   navigate("/PickupBooking");
-      //   return;
-      // }
-
-      // if (auth.currentUser.email === "smitha@gmail.com") {
-      //   localStorage.setItem(
-      //     "enquiryAuthToken",
-      //     JSON.stringify({
-      //       email: "smitha@gmail.com",
-      //       role: "sales associate ",
-      //       name: "smitha",
-      //     })
-      //   );
-      //   navigate("/PickupBooking");
-      //   return;
-      // }
-      // if (auth.currentUser.email === "dinesh@gmail.com") {
-      //   localStorage.setItem(
-      //     "enquiryAuthToken",
-      //     JSON.stringify({
-      //       email: "dinesh@gmail.com",
-      //       role: "Manager",
-      //       name: "dinesh",
-      //     })
-      //   );
-      //   navigate("/PickupBooking");
-      //   return;
-      // }
-      // if (auth.currentUser.email === "sana@gmail.com") {
-      //   localStorage.setItem(
-      //     "enquiryAuthToken",
-      //     JSON.stringify({
-      //       email: "sana@gmail.com",
-      //       role: "coordinator",
-      //       name: "sana",
-      //     })
-      //   );
-      //   navigate("/PickupBooking");
-      //   return;
-      // }
     } catch (error) {
       console.log(error.code);
       console.log(error);

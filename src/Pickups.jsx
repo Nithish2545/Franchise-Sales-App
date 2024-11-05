@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Nav from "./Nav";
 import { collection, query, onSnapshot, where } from "firebase/firestore";
 import { db } from "./firebase";
+import collection_baseAWb from "./functions/collectionName";
 
 function Pickups() {
   
@@ -17,8 +18,8 @@ function Pickups() {
 
   // Fetch user info from localStorage
   useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem("FrachiseLogin"));
-    console.log(JSON.parse(localStorage.getItem("FrachiseLogin")));
+    const storedUser = JSON.parse(localStorage.getItem("FranchiseLogin"));
+    console.log(JSON.parse(localStorage.getItem("FranchiseLogin")));
     setUsername(storedUser?.name);
     setRole(storedUser.role);
   }, []);
@@ -27,7 +28,6 @@ function Pickups() {
     const [datePart, timePart] = dateTimeString.split("&"); // Split date and time
     const [year, month, day] = datePart.split("-"); // Get year, month, day
     const [hour, minute] = timePart.split(" ")[0].split(":"); // Get hour and minute
-
     // Convert hour to 24-hour format if it's PM
     const isPM = timePart.includes("PM") && hour !== "12";
     const adjustedHour = isPM ? parseInt(hour, 10) + 12 : hour;
@@ -42,9 +42,9 @@ function Pickups() {
         try {
           const q =
             role === "sales admin" ||  role==="Manager"
-              ? query(collection(db, "pickup")) // Fetch all pickups for sales admin
+              ? query(collection(db, collection_baseAWb.getCollection())) // Fetch all pickups for sales admin
               : query(
-                  collection(db, "pickup"),
+                  collection(db, collection_baseAWb.getCollection()),
                   where("pickupBookedBy", "==", username)
                 ); // Fetch only user's pickups
 

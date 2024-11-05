@@ -3,15 +3,15 @@ import Nav from "./Nav";
 import PaymentConfirmCard from "./PaymentConfirmCard";
 import { collection, onSnapshot } from "firebase/firestore";
 import {db} from  "./firebase"
-
+import collection_baseAwb  from "./functions/collectionName"
 function PaymentConfirm() {
   
   const [data, setData] = useState([]);
   const [activeTab, setActiveTab] = useState("PAYMENT PENDING");
-
+console.log( collection_baseAwb.getCollection())
   useEffect(() => {
     // Set up a real-time listener for Firestore data using onSnapshot
-    const unsubscribe = onSnapshot(collection(db, "pickup"), (snapshot) => {
+    const unsubscribe = onSnapshot(collection(db,  collection_baseAwb.getCollection()), (snapshot) => {
       const documents = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),

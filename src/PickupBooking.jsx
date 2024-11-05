@@ -4,7 +4,8 @@ import { getData } from "country-list";
 import Nav from "./Nav";
 import { db, storage } from "./firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, getDocs, query } from "firebase/firestore";
+import collection_baseAWb from "./functions/collectionName";
 
 function PickupBooking() {
   const [loading, setLoading] = useState(false);
@@ -47,16 +48,14 @@ function PickupBooking() {
 
   // Example usage
   useEffect(() => {
-    const data = JSON.parse(localStorage.getItem("FrachiseLogin")).name;
+    const data = JSON.parse(localStorage.getItem("FranchiseLogin"))?.name;
     setUsername(data);
   }, []);
-
   useEffect(() => {
     var countryData = getData();
     countryData.push({ code: "UAE", name: "United Arab Emirates" });
     countryData.push({ code: "EU", name: "Singapore" });
     countryData.push({ code: "US", name: "USA" });
-
     countryData = countryData.map((country) =>
       country.code == "GB" ? { ...country, name: "United Kingdom" } : country
     );
@@ -80,49 +79,41 @@ function PickupBooking() {
     const sortedCountries = countryData.sort((a, b) =>
       a.name.localeCompare(b.name)
     );
-
     // Map top countries to their data
     const topCountryData = topCountries
       .map((name) => sortedCountries.find((country) => country.name === name))
       .filter(Boolean); // Remove any undefined entries
-
     // Filter out top countries from sorted list
     const remainingCountries = sortedCountries.filter(
       (country) => !topCountries.includes(country.name)
     );
-
     // Combine top countries with remaining countries
     const orderedCountries = [...topCountryData, ...remainingCountries];
-
     setCountries(orderedCountries);
-
     // Create a map of country codes to names
     const codeToNameMap = orderedCountries.reduce((acc, country) => {
       acc[country.code] = country.name;
       return acc;
     }, {});
-
     setCountryCodeToName(codeToNameMap);
   }, []);
 
   const onSubmit = async (data) => {
     try {
-      console.log(latitudelongitude);
       if (latitudelongitude == "") {
-        console.log("okk");
         seterror("Latitude & Longitude  Is Required!");
         return;
       }
       setLoading(true);
       seterror("");
       const result = splitLati_Logi(latitudelongitude);
+      // Add a default if needed
       const destinationCountryName =
         countryCodeToName[data.country] || data.country;
       // Step 1: Fetch current maximum awbNumber
-      const pickupsRef = collection(db, "pickup");
+      const pickupsRef = collection(db,  collection_baseAWb.getCollection());
       const snapshot = await getDocs(pickupsRef);
-      let maxAwbNumber = 1000; // Initialize to 0
-
+      let maxAwbNumber =  collection_baseAWb.getFranchiseBasedAWb(); // Initialize to 0
       if (!snapshot.empty) {
         snapshot.forEach((doc) => {
           const pickupData = doc.data();
@@ -134,7 +125,6 @@ function PickupBooking() {
           }
         });
       }
-
       // Step 2: Increment awbNumber
       const newAwbNumber = maxAwbNumber + 1;
       const uploadedImageURLs = await uploadImages(files, newAwbNumber);
@@ -145,12 +135,10 @@ function PickupBooking() {
         consignorname: data.Consignorname,
         consignorphonenumber: data.Consignornumber,
         consignorlocation: data.Consignorlocation,
-
         // Consignee Data
         consigneename: data.consigneename,
         consigneephonenumber: data.consigneenumber,
         consigneelocation: data.consigneelocation,
-
         content: data.Content,
         longitude: result.longitude,
         latitude: result.latitude,
@@ -170,18 +158,13 @@ function PickupBooking() {
         vendorName: data.vendor,
         service: service,
         imageUrLs: null,
-
         pickupCompletedDatatime: null,
         pickUpPersonName: "Unassigned",
-
         postNumberOfPackages: null,
         postPickupWeight: null,
-
         actualNoOfPackages: null,
         actualWeight: null,
-
         status: "RUN SHEET",
-
         pickupBookedBy: username,
         vendorAwbnumber: null,
         pickUpPersonNameStatus: null,
@@ -190,6 +173,7 @@ function PickupBooking() {
         packageConnectedDataTime: null,
         logisticCost: null,
         KycImage: uploadedImageURLs.length == 0 ? "" : uploadedImageURLs[0],
+        FranchiseLocation:  collection_baseAWb.getCollection(),
       });
       setShowModal(true);
       setFiles([]);

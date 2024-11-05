@@ -7,11 +7,16 @@ import CloseIcon from "@mui/icons-material/Close"; // Close icon for sidebar
 
 function Nav() {
   const location = useLocation();
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false); // State to control sidebar visibility
-
   useEffect(() => {
-    setUser(JSON.parse(localStorage.getItem("FrachiseLogin")));
+    console.log("testing")
+    // Fetch user from localStorage on component mount
+    const storedUser = localStorage.getItem("FranchiseLogin");
+    console.log(storedUser)
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
   }, []);
 
   return (
@@ -19,7 +24,6 @@ function Nav() {
       {/* Left Section */}
       <div className="flex items-center gap-4">
         <img src="/logo.png" className="h-10" alt="Logo" />
-
         {/* Hamburger icon for mobile */}
         <button
           className="lg:hidden block text-white"
@@ -27,7 +31,6 @@ function Nav() {
         >
           <MenuIcon fontSize="large" />
         </button>
-
         {/* Navigation Links for larger screens */}
         <ul className="hidden lg:flex space-x-8 gap-10 items-center">
           <li>
@@ -96,30 +99,22 @@ function Nav() {
               Pickups
             </Link>
           </li>
-          {user.email == "dinesh@gmail.com" && (
-            <li>
-              <Link
-                to="/logisticsDashboard"
-                className={`text-white rounded transition-colors ${
-                  location.pathname === "/logisticsDashboard"
-                    ? "text-purple-900 font-semibold"
-                    : "bg-transparent"
-                }`}
-                style={{ minHeight: "40px" }}
-              >
-                Logistics Dashboard
-              </Link>
-            </li>
-          )}
         </ul>
       </div>
       {/* Right Section */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
-          <Avatar>{user?.name?.slice(0, 1)}</Avatar>
+          <Avatar>{user?.name?.slice(0, 1)  || "?" }</Avatar>
+          
           <div className="text-black hidden sm:block">
-            <p className="font-medium">{user?.email}</p>
-            <p>{user?.name}</p>
+          {user ? (
+          <>
+            <p className="font-medium">{user.email}</p>
+            <p>{user.name}</p>
+          </>
+        ) : (
+          <p>Loading user info...</p> // Display loading text or spinner
+        )}
           </div>
         </div>
         <div
@@ -132,7 +127,6 @@ function Nav() {
           Logout
         </div>
       </div>
-
       {/* Sidebar for mobile screens */}
       <div
         className={`fixed top-0 left-0 h-full w-64 bg-white z-20 transform ${
@@ -214,7 +208,6 @@ function Nav() {
           </li>
         </ul>
       </div>
-
       {/* Overlay when sidebar is open */}
       {sidebarOpen && (
         <div
@@ -225,5 +218,4 @@ function Nav() {
     </nav>
   );
 }
-
 export default Nav;

@@ -4,6 +4,8 @@ import ResheduleCard from "./ResheduleCard"
 import CancelCard from "./CancelCard"
 import { collection, onSnapshot } from "firebase/firestore";
 import { db } from "./firebase";
+import collection_baseAwb  from "./functions/collectionName"
+
 function CancelOrReschedule() {
 
   const [data, setData] = useState([]);
@@ -11,7 +13,7 @@ function CancelOrReschedule() {
 
   useEffect(() => {
     // Real-time listener for Firestore data using onSnapshot
-    const unsubscribe = onSnapshot(collection(db, "pickup"), (snapshot) => {
+    const unsubscribe = onSnapshot(collection(db, collection_baseAwb.getCollection()), (snapshot) => {
       const documents = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),

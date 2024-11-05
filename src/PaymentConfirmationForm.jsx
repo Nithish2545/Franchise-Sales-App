@@ -14,6 +14,7 @@ import {
   updateDoc,
   serverTimestamp,
 } from "firebase/firestore";
+import collection_baseAwb from "./functions/collectionName";
 
 function PaymentConfirmationForm() {
   const { awbnumber } = useParams();
@@ -133,7 +134,7 @@ function PaymentConfirmationForm() {
       try {
         // Create a query to fetch documents with status "PAYMENT PENDING" and the given awbNumber
         const q = query(
-          collection(db, "pickup"),
+          collection(db, collection_baseAwb.getCollection()),
           where("awbNumber", "==", parseInt(awbnumber))
         );
 
@@ -210,7 +211,7 @@ function PaymentConfirmationForm() {
         throw new Error("User details not found");
       }
       const q = query(
-        collection(db, "pickup"),
+        collection(db, collection_baseAwb.getCollection()),
         where("awbNumber", "==", parseInt(awbnumber))
       );
 
@@ -221,7 +222,7 @@ function PaymentConfirmationForm() {
         final_result.push({ id: doc.id, ...doc.data() });
       });
 
-      const docRef = doc(db, "pickup", final_result[0].id); // db is your Firestore instance
+      const docRef = doc(db, collection_baseAwb.getCollection(), final_result[0].id); // db is your Firestore instance
       console.log(data.consigneename1);
       const updatedFields = {
         status: "PAYMENT DONE",
