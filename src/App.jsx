@@ -22,7 +22,7 @@ function App() {
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        const q = query(collection(db, "FranchiseLoginCredentials"));
+        const q = query(collection(db, "LoginCredentials"));
         const querySnapshot = await getDocs(q);
         for (const doc of querySnapshot.docs) {
           const result = doc.data();

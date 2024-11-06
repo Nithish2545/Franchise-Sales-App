@@ -10,10 +10,10 @@ function Nav() {
   const [user, setUser] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false); // State to control sidebar visibility
   useEffect(() => {
-    console.log("testing")
+    console.log("testing");
     // Fetch user from localStorage on component mount
     const storedUser = localStorage.getItem("FranchiseLogin");
-    console.log(storedUser)
+    console.log(storedUser);
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -104,17 +104,17 @@ function Nav() {
       {/* Right Section */}
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-3">
-          <Avatar>{user?.name?.slice(0, 1)  || "?" }</Avatar>
-          
+          <Avatar>{user?.name?.slice(0, 1) || "?"}</Avatar>
+
           <div className="text-black hidden sm:block">
-          {user ? (
-          <>
-            <p className="font-medium">{user.email}</p>
-            <p>{user.name}</p>
-          </>
-        ) : (
-          <p>Loading user info...</p> // Display loading text or spinner
-        )}
+            {user ? (
+              <>
+                <p className="font-medium">{user.email}</p>
+                <p>{user.name}</p>
+              </>
+            ) : (
+              <p>Loading user info...</p> // Display loading text or spinner
+            )}
           </div>
         </div>
         <div

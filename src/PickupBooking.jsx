@@ -4,7 +4,7 @@ import { getData } from "country-list";
 import Nav from "./Nav";
 import { db, storage } from "./firebase";
 import { getDownloadURL, ref, uploadBytesResumable } from "firebase/storage";
-import { addDoc, collection, getDocs, query } from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
 import collection_baseAWb from "./functions/collectionName";
 
 function PickupBooking() {
@@ -13,12 +13,8 @@ function PickupBooking() {
   const [countryCodeToName, setCountryCodeToName] = useState({});
   const [showModal, setShowModal] = useState(false);
   const [uploadProgress, setUploadProgress] = useState({});
-  const [imageURLs, setImageURLs] = useState([]);
   const [username, setUsername] = useState("");
   const [files, setFiles] = useState([]);
-  const [awbNumber, setawbNumber] = useState();
-  const [frachise, setfrachise] = useState("");
-  const [clientName, setClientName] = useState("");
   const [service, setservice] = useState("");
   const [latitudelongitude, setlatitudelongitude] = useState("");
   const [error, seterror] = useState("");
@@ -153,7 +149,6 @@ function PickupBooking() {
           data.pickupHour +
           " " +
           data.pickupPeriod,
-        franchise: frachise,
         awbNumber: newAwbNumber, // Add the new awbNumber here
         vendorName: data.vendor,
         service: service,
@@ -173,7 +168,7 @@ function PickupBooking() {
         packageConnectedDataTime: null,
         logisticCost: null,
         KycImage: uploadedImageURLs.length == 0 ? "" : uploadedImageURLs[0],
-        FranchiseLocation:  collection_baseAWb.getCollection(),
+        franchise:  collection_baseAWb.getCollection(),
       });
       setShowModal(true);
       setFiles([]);
